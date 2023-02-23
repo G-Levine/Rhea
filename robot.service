@@ -1,0 +1,14 @@
+[Unit]
+Description=Robot service
+After=network.target
+
+[Service]
+ExecStart=/home/pi/mambaforge/bin/python main.py
+WorkingDirectory=/home/pi/Rhea
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
