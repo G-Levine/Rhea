@@ -12,6 +12,7 @@ from data_types import *
 import canmotorlib
 
 SLEEP_TIME = 0.1
+ZERO_SLEEP_TIME = 1.5
 
 class HardwareInterface:
 
@@ -20,7 +21,7 @@ class HardwareInterface:
             command.data = canmotorlib.ZERO_MOTOR
             command.reply_required = False
         await self.transport.cycle(self.commands, request_attitude=True)
-        time.sleep(SLEEP_TIME)
+        time.sleep(ZERO_SLEEP_TIME)
         for command in self.commands:
             command.data = canmotorlib.ENABLE_MOTOR
             command.reply_required = True
@@ -29,19 +30,16 @@ class HardwareInterface:
 
 
     async def stop_all(self):
-        # Zero the commands first
-        for command in self.commands:
-            command.data = canmotorlib.ZERO_MOTOR
-            command.reply_required = False
-        await self.transport.cycle(self.commands, request_attitude=True)
-        time.sleep(SLEEP_TIME)
-        # Disable the motors
         for command in self.commands:
             command.data = canmotorlib.DISABLE_MOTOR
             command.reply_required = False
         await self.transport.cycle(self.commands, request_attitude=True)
         time.sleep(SLEEP_TIME)
-
+        for command in self.commands:
+            command.data = canmotorlib.ZERO_MOTOR
+            command.reply_required = False
+        await self.transport.cycle(self.commands, request_attitude=True)
+        time.sleep(ZERO_SLEEP_TIME)
 
     def id_to_idx(self, id):
         return id - 1
@@ -90,7 +88,8 @@ class HardwareInterface:
         single_can_config = moteus_pi3hat.CanConfiguration()
         single_can_config.fdcan_frame = False
         single_can_config.bitrate_switch = False
-        can_config = {i: single_can_config for i in range(5)}
+        num_buses = 2
+        can_config = {i: single_can_config for i in range(num_buses + 1)}
 
         # Configure the mounting angle
         # Extrinsic Euler angles in order of roll, pitch, yaw

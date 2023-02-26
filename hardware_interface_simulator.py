@@ -16,7 +16,7 @@ class HardwareInterfaceSimulator():
     def __init__(self):
         self.observation = np.zeros(1, dtype=observation_dtype)
 
-        self.control_rate_hz = yaml.safe_load(open("config.yaml"))["control_rate_hz"]
+        self.control_rate_hz = yaml.safe_load(open("config.yaml"))["loop_rate_hz"]
         self.config = yaml.safe_load(open("config.yaml"))["actuators"]
 
         p.connect(p.GUI)

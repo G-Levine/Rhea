@@ -36,11 +36,14 @@ class Commander():
         """
         last_time = self.current_time
         self.current_time = time.time() - self.start_time
-        # dt = self.current_time - last_time
-        dt = 1.0 / self.config["loop_rate_hz"]
+        dt = self.current_time - last_time
+        # dt = 1.0 / self.config["loop_rate_hz"]
 
         # Update the operating mode.
         if self.operating_mode == OperatingMode.IDLE:
+            if not user_input['start_toggle']:
+                # If the robot is idle and the user requests an emergency stop, transition to the IDLE operating mode.
+                self.idle_transition()
             if user_input['stand_up_toggle']:
                 # If the robot is idle and the user wants to stand up, transition to the STAND_UP operating mode.
                 self.stand_up_transition()
@@ -74,6 +77,17 @@ class Commander():
             desired_x_vel = user_input["x"] * self.config["x_vel_limit_mps"]
             desired_yaw_vel = user_input["yaw"] * \
                 self.config["yaw_vel_limit_rps"]
+
+            # Limit the commanded velocity trajectory to the acceleration limits.
+            desired_x_vel_acc_limited = np.clip(
+                desired_x_vel - self.command_traj_end["odometry_x_vel"], -self.config["x_acc_limit_mps2"] * dt, self.config["x_acc_limit_mps2"] * dt)
+            desired_yaw_vel_acc_limited = np.clip(
+                desired_yaw_vel - self.command_traj_end["odometry_yaw_vel"], -self.config["yaw_acc_limit_mps2"] * dt, self.config["yaw_acc_limit_mps2"] * dt)
+            desired_x_vel = self.command_traj_end["odometry_x_vel"] + \
+                desired_x_vel_acc_limited
+            desired_yaw_vel = self.command_traj_end["odometry_yaw_vel"] + \
+                desired_yaw_vel_acc_limited
+
             self.command_traj_start["odometry_x_vel"] = desired_x_vel
             self.command_traj_start["odometry_yaw_vel"] = desired_yaw_vel
             self.command_traj_end["odometry_x_vel"] = desired_x_vel

@@ -20,25 +20,33 @@ actuators:
     type: GIM6010_6
     zero_offset_deg: 0
 
+# Input
+deadzone: 0.05
+
 # Commander
-x_vel_limit_mps: 1.5
-yaw_vel_limit_rps: 4.0
+x_vel_limit_mps: 3.5
+x_acc_limit_mps2: 5.0
+yaw_vel_limit_rps: 5.0
+yaw_acc_limit_mps2: 80.0
 sitting_leg_length_m: 0.07814
 standing_leg_length_m: 0.3182
-stand_up_duration_s: 1.0
-sit_down_duration_s: 1.0
+stand_up_duration_s: 0.5
+sit_down_duration_s: 0.5
 
 # Controller
-k_x: 5.0
-k_pitch: 30.0
-k_x_vel: 2.0
-k_pitch_vel: 4.5
+k_x: 10.0
+k_pitch: 40.0
+k_x_vel: 5.0
+k_pitch_vel: 15.0
 
 leg_kp: 50.0
 leg_kd: 5.0
 
-yaw_kp: 10.0
-yaw_kd: 0.1
+yaw_kp: 2.0
+yaw_kd: 0.5
+
+roll_kp: 0.0
+roll_kd: 0.0
 
 leg_link_m: 0.225
 wheel_diam_m: 0.2
@@ -46,8 +54,9 @@ wheelbase_m: 0.281
 friction_coeff: 1.0
 
 # State estimator
-contact_threshold_n: 1.0
+contact_threshold_n: 5.0
 default_com_x: -0.05
 
 # Main loop
-loop_rate_hz: 200
+# loop_rate_hz: 200
+loop_rate_hz: 400

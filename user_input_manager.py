@@ -1,9 +1,11 @@
 import numpy as np
 import hid
+import yaml
 # Requires the hidapi library to be installed.
 
 from data_types import user_input_dtype
 
+ALLOWABLE_DEVICES = ['FrSky Simulator', 'BetaFPV Taranis Joystick', 'FrSky Taranis Joystick', 'BETAFPV Joystick']
 
 class UserInputManager():
     """
@@ -12,9 +14,10 @@ class UserInputManager():
 
     def __init__(self):
         self.user_input = np.zeros(1, dtype=user_input_dtype)
+        self.config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
         self.device = hid.device()
         for device in hid.enumerate():
-            if (device['product_string'] == 'FrSky Simulator') or (device['product_string'] == 'BetaFPV Taranis Joystick') or (device['product_string'] == 'FrSky Taranis Joystick') or (device['vendor_id'] == 1155):
+            if device['product_string'] in ALLOWABLE_DEVICES:
                 self.device.open(device['vendor_id'], device['product_id'])
                 break
         # if not self.device:
@@ -28,10 +31,16 @@ class UserInputManager():
         report = self.device.read(64)
         if report:
             report = [r - 256 if r > 127 else r for r in report]
-            self.user_input['start_toggle'] = report[7] > 0
-            self.user_input['stand_up_toggle'] = report[10] > 0
-            self.user_input['x'] = report[4] / 127.0
-            self.user_input['yaw'] = report[3] / 127.0
+            self.user_input['start_toggle'] = report[7] >= 0
+            self.user_input['stand_up_toggle'] = report[10] >= 0
+            x = report[4] / 127.0
+            yaw = report[3] / 127.0
+            if abs(x) < self.config['deadzone']:
+                x = 0
+            if abs(yaw) < self.config['deadzone']:
+                yaw = 0
+            self.user_input['x'] = x
+            self.user_input['yaw'] = yaw
         return self.user_input
 
 

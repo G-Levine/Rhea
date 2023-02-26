@@ -27,11 +27,12 @@ class Controller():
         """
         Leg control.
         """
+        roll_compensation = np.clip(state["roll"] * (self.config["wheelbase_m"] / 2.0), -0.1, 0.1)
         leg_angle_target_r = - \
-            np.arccos(command["leg_length_r"] /
+            np.arccos((command["leg_length_r"] + roll_compensation) /
                       (2 * self.config["leg_link_m"]))
         leg_angle_target_l = np.arccos(
-            command["leg_length_l"] / (2 * self.config["leg_link_m"]))
+            (command["leg_length_l"] - roll_compensation) / (2 * self.config["leg_link_m"]))
 
         self.action["desired_leg_1_r_pos"] = leg_angle_target_r
         self.action["desired_leg_1_l_pos"] = leg_angle_target_l
