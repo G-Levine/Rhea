@@ -21,7 +21,7 @@ def sit_down():
     send_request(b"sit")
 
 def command_velocity(x, yaw, time):
-    send_request(b"move_{}_{}_{}".format(x, yaw, time))
+    send_request(bytes("move_{}_{}_{}".format(x, yaw, time), "utf-8"))
 
 def send_request(request):
     print(f"Sending request {request} …")
