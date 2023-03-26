@@ -4,7 +4,8 @@ import sys
 import yaml
 
 from state_estimator import StateEstimator
-from user_input_manager import UserInputManager
+# from user_input_manager import UserInputManager
+from api_input_manager import UserInputManager
 from telemetry_manager import TelemetryManager
 from commander import Commander
 from controller import Controller

@@ -15,15 +15,21 @@ class UserInputManager():
     def __init__(self):
         self.user_input = np.zeros(1, dtype=user_input_dtype)
         self.config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
-        self.device = hid.device()
-        for device in hid.enumerate():
-            if device['product_string'] in ALLOWABLE_DEVICES:
-                self.device.open(device['vendor_id'], device['product_id'])
-                break
-        # if not self.device:
-            # raise RuntimeError('No gamepad found.')
-        if self.device:
-            self.device.set_nonblocking(True)
+        try:
+            self.device = hid.device()
+            for device in hid.enumerate():
+                if device['product_string'] in ALLOWABLE_DEVICES:
+                    self.device.open(device['vendor_id'], device['product_id'])
+                    break
+            # if not self.device:
+                # raise RuntimeError('No gamepad found.')
+            if self.device:
+                self.device.set_nonblocking(True)
+        except:
+            self.device = None
+            print("No input device")
+            self.user_input['start_toggle'] = True
+            self.user_input['stand_up_toggle'] = True
 
     def update(self):
         if not self.device:
