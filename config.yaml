@@ -21,13 +21,13 @@ actuators:
     zero_offset_deg: 0
 
 # Input
-deadzone: 0.05
+deadzone: 0.0
 
 # Commander
-x_vel_limit_mps: 3.5
-x_acc_limit_mps2: 5.0
-yaw_vel_limit_rps: 5.0
-yaw_acc_limit_mps2: 80.0
+x_vel_limit_mps: 1.0
+x_acc_limit_mps2: 500.0
+yaw_vel_limit_rps: 4.0
+yaw_acc_limit_mps2: 800.0
 sitting_leg_length_m: 0.07814
 standing_leg_length_m: 0.3182
 stand_up_duration_s: 0.5
@@ -42,8 +42,8 @@ k_pitch_vel: 15.0
 leg_kp: 50.0
 leg_kd: 5.0
 
-yaw_kp: 2.0
-yaw_kd: 0.5
+yaw_kp: 0.0
+yaw_kd: 1.0
 
 roll_kp: 0.0
 roll_kd: 0.0
