@@ -1,5 +1,12 @@
 import zmq
 
+from elevenlabslib import *
+
+API_KEY = "2d876cea3d5fefadc247d37f6926daae"
+
+user = ElevenLabsUser(API_KEY)
+voice = user.get_voices_by_name("Rachel")[0]  # This is a list because multiple voices can have the same name
+
 context = zmq.Context()
 
 #  Socket to talk to server
@@ -16,7 +23,6 @@ def sit_down():
 def command_velocity(x, yaw, time):
     send_request(b"move_{}_{}_{}".format(x, yaw, time))
 
-
 def send_request(request):
     print(f"Sending request {request} …")
     socket.send(request)
@@ -24,3 +30,6 @@ def send_request(request):
     #  Get the reply.
     message = socket.recv()
     print(f"Received reply {request} [ {message} ]")
+
+def say(text):
+    voice.generate_and_play_audio(text, playInBackground=False)
