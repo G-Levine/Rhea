@@ -1,4 +1,5 @@
 import zmq
+import time
 
 from elevenlabslib import *
 
@@ -16,12 +17,15 @@ socket.connect("tcp://192.168.1.100:5555")
 
 def stand_up():
     send_request(b"stand")
+    time.sleep(2)
 
 def sit_down():
     send_request(b"sit")
+    time.sleep(2)
 
 def command_velocity(x, yaw, time):
     send_request(bytes("move_{}_{}_{}".format(x, yaw, time), "utf-8"))
+    time.sleep(time)
 
 def send_request(request):
     print(f"Sending request {request} …")
@@ -32,4 +36,4 @@ def send_request(request):
     print(f"Received reply {request} [ {message} ]")
 
 def say(text):
-    voice.generate_and_play_audio(text, playInBackground=False)
+    voice.generate_and_stream_audio(text)
