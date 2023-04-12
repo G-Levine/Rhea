@@ -61,9 +61,9 @@ class UserInputManager():
             message = message.decode('utf8')
             if "collision" in message:
                 # If collided, stop moving and turn around
-                self.user_input['x'] = 0
+                self.user_input['x'] = -0.5
                 self.user_input['yaw'] = 1.57
-                self.command_end_time = time.time() + 2.0
+                self.command_end_time = time.time() + 1.0
             response = b"Got collision notification"
             collision_monitor_socket.send(response)
         except zmq.Again:
