@@ -8,9 +8,16 @@ from data_types import user_input_dtype
 import zmq
 import time
 
-context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind("tcp://*:5555")
+# Create the ZMQ sockets
+# The API client socket is used to receive commands from the API client thread
+api_client_context = zmq.Context()
+api_client_socket = api_client_context.socket(zmq.REP)
+api_client_socket.bind("tcp://*:5555")
+
+# The collision monitor socket is used to receive collision notifications from the collision monitor thread
+collision_monitor_context = zmq.Context()
+collision_monitor_socket = collision_monitor_context.socket(zmq.REP)
+collision_monitor_socket.bind("tcp://*:5556")
 
 class UserInputManager():
     """
@@ -25,11 +32,14 @@ class UserInputManager():
         self.command_end_time = time.time()
 
     def update(self):
+        # Check if the command has timed out
         if self.command_end_time < time.time():
             self.user_input['x'] = 0
             self.user_input['yaw'] = 0
+
+        # Receive command from the API client thread if available
         try:
-            message = socket.recv(zmq.NOBLOCK)
+            message = api_client_socket.recv(zmq.NOBLOCK)
             message = message.decode('utf8')
             if "stand" in message:
                 self.user_input['stand_up_toggle'] = True
@@ -41,9 +51,23 @@ class UserInputManager():
                 self.user_input['yaw'] = command_substrings[2]
                 self.command_end_time = time.time() + float(command_substrings[3])
             response = b"Got command"
-            socket.send(response)
+            api_client_socket.send(response)
         except zmq.Again:
             pass
+
+        # Receive collision notification from the collision monitor thread if available
+        try:
+            message = collision_monitor_socket.recv(zmq.NOBLOCK)
+            message = message.decode('utf8')
+            if "collision" in message:
+                self.user_input['x'] = 0
+                self.user_input['yaw'] = 0
+                self.command_end_time = time.time()
+            response = b"Got collision notification"
+            collision_monitor_socket.send(response)
+        except zmq.Again:
+            pass
+
         return self.user_input
 
 
